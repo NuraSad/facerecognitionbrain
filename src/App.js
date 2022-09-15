@@ -14,11 +14,30 @@ class App extends React.Component {
     this.state = {
       input: "",
       IMAGE_URL: "",
+      box: {},
     }
   }
 
   onInputChange = (event) => {
     this.setState({input: event.target.value});
+  }
+
+  calculateFaceLocation = (data) => {
+    const FaceLocation = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const ImageDetec = document.getElementById('inputimage');
+    const ImageWidth = Number(ImageDetec.width);
+    const ImageHeight = Number(ImageDetec.height);
+    return {
+      leftCol: FaceLocation.left_col * ImageWidth,
+      topRow: FaceLocation.top_row * ImageHeight,
+      rightCol: ImageWidth - (FaceLocation.right_col * ImageWidth),
+      bottomRow: ImageHeight -(FaceLocation.bottom_row * ImageHeight)
+    }
+  }
+
+  displayFaceBox = (box) => {
+    console.log(box);
+    this.setState({box: box});
   }
   
   onButtonSubmit = () => {
@@ -56,7 +75,7 @@ class App extends React.Component {
 
     fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
         .then(response => response.json())
-        .then(result => console.log(result.outputs[0].data.regions[0].region_info.bounding_box))
+        .then(result => this.displayFaceBox(this.calculateFaceLocation(result)))
         .catch(error => console.log('error', error));
     }
 
@@ -68,7 +87,7 @@ class App extends React.Component {
         <Logo />
         <Rank />
         <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit}/>
-        <FaceRecognition ImageUrl={this.state.IMAGE_URL}/>
+        <FaceRecognition box={this.state.box} ImageUrl={this.state.IMAGE_URL}/>
       </div>
     );
   }
