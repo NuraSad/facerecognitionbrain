@@ -33,7 +33,7 @@ const Particle = () => {
             width: 1,
           },
           collisions: {
-            enable: true,
+            enable: false,
           },
           move: {
             directions: "none",
@@ -41,6 +41,10 @@ const Particle = () => {
             outModes: {
               default: "bounce",
             },
+            "attract": {
+              "enable": false,
+              "rotateX": 10,
+              "rotateY": 10},
             random: false,
             speed: 2,
             straight: false,
